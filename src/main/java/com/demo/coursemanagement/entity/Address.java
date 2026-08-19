@@ -2,13 +2,7 @@ package com.demo.coursemanagement.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "addresses")
@@ -21,23 +15,35 @@ public class Address {
     @Column(name = "door_no")
     private String doorNo;
 
-    @Column
     private String street;
 
-    @Column
     private String area;
 
-    @Column
     private String state;
 
-    @Column
     private String pincode;
+
+
+    // =========================
+    // ONE-TO-ONE
+    // Address -> Student
+    // =========================
+
+    @OneToOne(mappedBy = "address")
+    @JsonBackReference("student-address")
+    private Student student;
+
+
+    // =========================
+    // Constructors
+    // =========================
 
     public Address() {
     }
 
     public Address(Long id, String doorNo, String street,
                    String area, String state, String pincode) {
+
         this.id = id;
         this.doorNo = doorNo;
         this.street = street;
@@ -46,8 +52,17 @@ public class Address {
         this.pincode = pincode;
     }
 
+
+    // =========================
+    // Getters and Setters
+    // =========================
+
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getDoorNo() {
@@ -56,10 +71,6 @@ public class Address {
 
     public void setDoorNo(String doorNo) {
         this.doorNo = doorNo;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getStreet() {
@@ -93,19 +104,12 @@ public class Address {
     public void setPincode(String pincode) {
         this.pincode = pincode;
     }
-    
+
     public Student getStudent() {
-    return student;
-}
+        return student;
+    }
 
-
-
-public void setStudent(Student student) {
-    this.student = student;
-}
-
- 
-@OneToOne(mappedBy = "address")
-    @JsonBackReference
-    private Student student;
+    public void setStudent(Student student) {
+        this.student = student;
+    }
 }

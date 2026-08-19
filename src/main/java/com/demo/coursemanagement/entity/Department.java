@@ -3,14 +3,9 @@ package com.demo.coursemanagement.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "departments")
@@ -23,12 +18,24 @@ public class Department {
     @Column(nullable = false)
     private String name;
 
+
+    // =========================
+    // ONE-TO-MANY
+    // Department -> Students
+    // =========================
+
     @OneToMany(
         mappedBy = "department",
         cascade = CascadeType.ALL,
         orphanRemoval = true
     )
+    @JsonBackReference("student-department")
     private List<Student> students = new ArrayList<>();
+
+
+    // =========================
+    // Constructors
+    // =========================
 
     public Department() {
     }
@@ -37,6 +44,11 @@ public class Department {
         this.id = id;
         this.name = name;
     }
+
+
+    // =========================
+    // Getters and Setters
+    // =========================
 
     public Long getId() {
         return id;
@@ -62,13 +74,26 @@ public class Department {
         this.students = students;
     }
 
+
+    // =========================
+    // Helper Methods
+    // =========================
+
     public void addStudent(Student student) {
+
         students.add(student);
-        student.setDepartment(this);
+
+        if (student.getDepartment() != this) {
+            student.setDepartment(this);
+        }
     }
 
     public void removeStudent(Student student) {
+
         students.remove(student);
-        student.setDepartment(null);
+
+        if (student.getDepartment() == this) {
+            student.setDepartment(null);
+        }
     }
 }

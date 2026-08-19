@@ -1,8 +1,11 @@
 package com.demo.coursemanagement.entity;
 
-import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "courses")
@@ -14,11 +17,23 @@ public class Course {
 
     @Column(nullable = false)
     private String name;
-    @Column
+
     private String duration;
 
+
+    // =========================
+    // MANY-TO-MANY
+    // Course -> Students
+    // =========================
+
     @ManyToMany(mappedBy = "courses")
+    @JsonBackReference("student-course")
     private List<Student> students = new ArrayList<>();
+
+
+    // =========================
+    // Constructors
+    // =========================
 
     public Course() {
     }
@@ -28,6 +43,11 @@ public class Course {
         this.name = name;
         this.duration = duration;
     }
+
+
+    // =========================
+    // Getters and Setters
+    // =========================
 
     public Long getId() {
         return id;
