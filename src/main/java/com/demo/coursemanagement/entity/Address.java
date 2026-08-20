@@ -1,6 +1,6 @@
 package com.demo.coursemanagement.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 
@@ -30,7 +30,7 @@ public class Address {
     // =========================
 
     @OneToOne(mappedBy = "address")
-    @JsonBackReference("student-address")
+    @JsonIgnore
     private Student student;
 
 
@@ -43,7 +43,6 @@ public class Address {
 
     public Address(Long id, String doorNo, String street,
                    String area, String state, String pincode) {
-
         this.id = id;
         this.doorNo = doorNo;
         this.street = street;
