@@ -3,7 +3,7 @@ package com.demo.coursemanagement.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 
@@ -33,7 +33,6 @@ public class Student {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id")
-    @JsonManagedReference("student-address")
     private Address address;
 
 
@@ -44,7 +43,6 @@ public class Student {
 
     @ManyToOne
     @JoinColumn(name = "department_id")
-    @JsonManagedReference("student-department")
     private Department department;
 
 
@@ -59,7 +57,6 @@ public class Student {
         joinColumns = @JoinColumn(name = "student_id"),
         inverseJoinColumns = @JoinColumn(name = "course_id")
     )
-    @JsonManagedReference("student-course")
     private List<Course> courses = new ArrayList<>();
 
 
@@ -72,7 +69,6 @@ public class Student {
 
     public Student(Long id, String name, String email,
                    Integer age, String city) {
-
         this.id = id;
         this.name = name;
         this.email = email;
@@ -152,6 +148,11 @@ public class Student {
     public void setCourses(List<Course> courses) {
         this.courses = courses;
     }
+
+
+    // =========================
+    // Course Helper Methods
+    // =========================
 
     public void addCourse(Course course) {
 
