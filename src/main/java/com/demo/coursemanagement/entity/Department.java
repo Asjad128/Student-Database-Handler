@@ -3,7 +3,7 @@ package com.demo.coursemanagement.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 
@@ -29,7 +29,7 @@ public class Department {
         cascade = CascadeType.ALL,
         orphanRemoval = true
     )
-    @JsonBackReference("student-department")
+    @JsonIgnore
     private List<Student> students = new ArrayList<>();
 
 
