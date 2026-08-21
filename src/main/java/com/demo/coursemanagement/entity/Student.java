@@ -3,7 +3,6 @@ package com.demo.coursemanagement.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 
@@ -51,7 +50,7 @@ public class Student {
     // Student -> Courses
     // =========================
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "student_courses",
         joinColumns = @JoinColumn(name = "student_id"),
