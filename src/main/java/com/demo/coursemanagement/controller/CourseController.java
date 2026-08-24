@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import com.demo.coursemanagement.entity.Course;
 import com.demo.coursemanagement.service.CourseService;
 
+
 @RestController
 @RequestMapping("/courses")
 public class CourseController {
@@ -24,7 +25,7 @@ public class CourseController {
     public ResponseEntity<Course> saveCourse(
             @RequestBody Course course) {
 
-        Course savedCourse =
+        Course savedCouhjuyhubkughbjuyrse =
                 courseService.saveCourse(course);
 
         return ResponseEntity
