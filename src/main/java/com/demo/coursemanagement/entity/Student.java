@@ -50,7 +50,7 @@ public class Student {
     // Student -> Courses
     // =========================
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany
     @JoinTable(
         name = "student_courses",
         joinColumns = @JoinColumn(name = "student_id"),
