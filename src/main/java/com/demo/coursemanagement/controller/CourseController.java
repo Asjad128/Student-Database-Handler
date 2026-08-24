@@ -25,7 +25,7 @@ public class CourseController {
     public ResponseEntity<Course> saveCourse(
             @RequestBody Course course) {
 
-        Course savedCouhjuyhubkughbjuyrse =
+        Course savedCourse =
                 courseService.saveCourse(course);
 
         return ResponseEntity
