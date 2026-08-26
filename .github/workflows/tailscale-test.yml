@@ -25,4 +25,4 @@ jobs:
 
       - name: Ping Ubuntu Server
         run: |
-          tailscale nc 100.112.108.20
+          tailscale nc 100.112.108.20 22
