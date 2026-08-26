@@ -1,4 +1,4 @@
-name: Test Tailscale Connection
+name: Test Tailscale + SSH
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 jobs:
-  test-tailscale:
+  test-connection:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,10 +19,23 @@ jobs:
           audience: ${{ secrets.TS_AUDIENCE }}
           tags: tag:ci
 
-      - name: Check Tailscale status
+      - name: Check Tailscale
         run: |
           tailscale status
 
-      - name: Ping Ubuntu Server
+      - name: Test SSH port
         run: |
           tailscale nc 100.112.108.20 22
+
+      - name: Test SSH login
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 100.112.108.20
+          username: deploy
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script: |
+            echo "SSH connection successful"
+            whoami
+            hostname
+            pwd
