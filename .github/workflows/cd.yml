@@ -58,7 +58,7 @@ jobs:
           overwrite: true
 
       # 6. Replace app.jar and restart application
-      - name: Install and restart application
+            - name: Install and restart application
         uses: appleboy/ssh-action@v1
         with:
           host: 100.112.108.20
@@ -68,14 +68,23 @@ jobs:
           script: |
             set -e
 
-            JAR=$(find /opt/student-database-handler -maxdepth 1 -name "*.jar" -type f | head -n 1)
+            JAR=$(find /opt/student-database-handler \
+              -maxdepth 1 \
+              -type f \
+              -name "*.jar" \
+              ! -name "app.jar" \
+              | head -n 1)
 
             if [ -z "$JAR" ]; then
-              echo "No JAR found"
+              echo "No new JAR found"
               exit 1
             fi
 
+            echo "New JAR found: $JAR"
+
             mv "$JAR" /opt/student-database-handler/app.jar
+
+            echo "Restarting application..."
 
             sudo systemctl restart student-database-handler
 
