@@ -1,0 +1,90 @@
+name: CD - Deploy to Server
+
+on:
+  workflow_run:
+    workflows: ["Java CI"]
+    types:
+      - completed
+    branches:
+      - main  
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Get the exact commit that passed CI
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      # 2. Use Java 21
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      # 3. Build the JAR
+      - name: Build application
+        run: mvn clean package -DskipTests
+
+      # 4. Connect GitHub Actions to your Tailscale network
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v4
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          audience: ${{ secrets.TS_AUDIENCE }}
+          tags: tag:ci
+
+      # 5. Upload the JAR to the server
+      - name: Upload JAR
+        uses: appleboy/scp-action@v1
+        with:
+          host: 100.112.108.20
+          username: deploy
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          source: "target/*.jar"
+          target: "/opt/student-database-handler/"
+          overwrite: true
+
+      # 6. Replace app.jar and restart application
+      - name: Install and restart application
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 100.112.108.20
+          username: deploy
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script: |
+            set -e
+
+            JAR=$(find /opt/student-database-handler -maxdepth 1 -name "*.jar" -type f | head -n 1)
+
+            if [ -z "$JAR" ]; then
+              echo "No JAR found"
+              exit 1
+            fi
+
+            mv "$JAR" /opt/student-database-handler/app.jar
+
+            sudo systemctl restart student-database-handler
+
+            sleep 5
+
+            if ! systemctl is-active --quiet student-database-handler; then
+              echo "Application failed to start"
+              sudo journalctl -u student-database-handler -n 50 --no-pager
+              exit 1
+            fi
+
+            echo "Deployment successful"
