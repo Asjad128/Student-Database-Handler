@@ -46,7 +46,7 @@ jobs:
           audience: ${{ secrets.TS_AUDIENCE }}
           tags: tag:ci
 
-      # 5. Upload the JAR to the server
+      # 5. Upload JAR
       - name: Upload JAR
         uses: appleboy/scp-action@v1
         with:
@@ -55,10 +55,10 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           source: "target/*.jar"
-          target: "/opt/student-database-handler/"
+          target: "/opt/student-database-handler/deploy/"
           overwrite: true
 
-      # 6. Replace app.jar and restart application
+      # 6. Install and restart application
       - name: Install and restart application
         uses: appleboy/ssh-action@v1
         with:
@@ -69,21 +69,27 @@ jobs:
           script: |
             set -e
 
-            JAR=$(find /opt/student-database-handler \
-              -maxdepth 1 \
+            echo "Checking uploaded JAR..."
+
+            JAR=$(find /opt/student-database-handler/deploy \
               -type f \
               -name "*.jar" \
-              ! -name "app.jar" \
               | head -n 1)
 
             if [ -z "$JAR" ]; then
-              echo "No new JAR found"
+              echo "No JAR found in deployment directory"
               exit 1
             fi
 
             echo "New JAR found: $JAR"
 
+            echo "Installing new application..."
+
             mv "$JAR" /opt/student-database-handler/app.jar
+
+            echo "Cleaning deployment directory..."
+
+            rm -f /opt/student-database-handler/deploy/*.jar
 
             echo "Restarting application..."
 
@@ -91,10 +97,18 @@ jobs:
 
             sleep 5
 
+            echo "Checking application status..."
+
             if ! systemctl is-active --quiet student-database-handler; then
               echo "Application failed to start"
-              sudo journalctl -u student-database-handler -n 50 --no-pager
+
+              sudo journalctl \
+                -u student-database-handler \
+                -n 50 \
+                --no-pager
+
               exit 1
             fi
 
+            echo "Application is running"
             echo "Deployment successful"
