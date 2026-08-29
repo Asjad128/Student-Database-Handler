@@ -6,7 +6,7 @@ on:
     types:
       - completed
     branches:
-      - main  
+      - main
 
 permissions:
   id-token: write
@@ -19,6 +19,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       # 1. Get the exact commit that passed CI
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -37,7 +38,7 @@ jobs:
       - name: Build application
         run: mvn clean package -DskipTests
 
-      # 4. Connect GitHub Actions to your Tailscale network
+      # 4. Connect GitHub Actions to Tailscale
       - name: Connect to Tailscale
         uses: tailscale/github-action@v4
         with:
@@ -58,7 +59,7 @@ jobs:
           overwrite: true
 
       # 6. Replace app.jar and restart application
-            - name: Install and restart application
+      - name: Install and restart application
         uses: appleboy/ssh-action@v1
         with:
           host: 100.112.108.20
